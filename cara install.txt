@@ -1,0 +1,18 @@
+nstallation
+
+First install nodeJs, then run from  root directory:
+
+npm install
+npm install -g bower
+npm install -g grunt
+bower install
+
+To serve a development instance:
+
+grunt serve
+
+Or to build a static instance for a production server:
+
+grunt build
+
+and serve the dist directory to whatever path you like with your favorite server software.

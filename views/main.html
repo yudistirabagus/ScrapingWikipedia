@@ -1,0 +1,147 @@
+
+<section class="intro">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+              
+           
+            </div>
+        </div>
+    </div>
+</section>
+
+<script type="text/ng-template" id="categoryTree">
+    <td>{{$parent.entity.name}}</td><td>{{son.name}}</td><td>{{son.index}}</td>
+    <tr ng-if="entity.sons" ng-repeat="entity in entity.sons" ng-include="'categoryTree'"></tr>
+</script>
+
+<section class="tool">
+    <div class="container">
+        <div class="box">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="message">Tempelkan daftar artikel wikipedia Anda di sini  Atau <a ng-click="setExample()">Coba Contoh</a></label>
+                        <textarea name="message" id="message" class="form-control" rows="9" cols="25"
+                                  placeholder="ex: https://en.wikipedia.org/wiki/Microsoft_Windows"
+                                  ng-model="$parent.query" ng-disabled="working()">
+                        </textarea>
+
+                        
+                    </div>
+                </div>
+                <div class="col-md-6">
+
+                    <div class="form-group" >
+                        <label>Stop words (tekan enter atau pisahkan dengan koma )</label>
+                        <span class="help"><i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="Tooltip on top"></i></span>
+                        <tags-input ng-disabled="working()" placeholder="tambahkan kata dan tekan enter" ng-model="stopWords"></tags-input>
+                    </div>
+                    <div class="col-md-4">
+                        <label>Distance</label>
+                        <span class="help"><i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="Tooltip on top"></i></span>
+                            <input ng-disabled="working()" type="number" name="input" ng-model="$parent.depth" min="1" max="5" style="width:60px" required>
+                    </div>
+                
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" id="crawl-button">
+                <div class="col-md-6">
+                    <button ng-disabled="!lang || (alert && alert.indexOf('collect') !== 0)" ng-hide="working()" ng-click="startCrawl()" class="btn btn-success btn-lg btn-block">Start Crawling</button>
+                    <button ng-show="working()"  class="btn btn-warning btn-lg btn-block" ng-disabled="true">{{resolved}} / {{pending}} pages resolved
+                        <span ng-show="getParents && parentsPending"> (still resolving {{parentsPending}} parents…)</span>
+                    </button>
+                </div>
+
+
+                <div class="col-md-3">
+                    <div ng-show="started">
+                        <button ng-show="working()" class="btn btn-danger btn-lg btn-block" ng-disabled="stopped" ng-click="clearQueue()">Stop &amp; clear queue </button>
+                        <div ng-hide="working()">
+                            <button class="btn btn-success dropdown-toggle btn-lg btn-block" data-toggle="dropdown">Download
+                                <span class="caret"></span>
+                                <span class="sr-only">Toggle Dropdown</span>
+                            </button>
+                            <ul class="dropdown-menu" role="menu">
+                           
+                                <li><a ng-click="downloadCSV()" href="#">TSV</a></li>
+                              
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div  class="col-md-3">
+                    <button
+                        ng-hide="cacheLinksEmpty || working()"
+                        title="For sanity and performance reasons, results are cached in your browser for {{cacheHours}} hours. Click here to reset cache if you feel like results are not in sync with Wikipedia pages" ng-click="clearCache()" class="btn btn-warning btn-lg btn-block">Clear Cache</button>
+                </div>
+            </div>
+            <div class="row" id="warning"></div>
+        </div>
+
+
+        <div class="row">
+            <div ng-show="started" class="results col-md-12">
+                <div class="sigma-tuto">
+                    <span class="left">Click a node to visit it on Wikipedia</span>
+                    <span class="right">{{osSpecialClick}}+Click a node to add it to the seeds</span>
+                </div>
+                <div class="sigma-legend"></div>
+                <div id="sigma"></div>
+                <div class="sigma-tools">
+                  <div class="btn-group-vertical">
+                    <button class="btn btn-link btn-sm" ng-click="resetCamera()">
+                      <span class="glyphicon glyphicon-record"></span>
+                    </button>
+                    <button class="btn btn-link btn-sm" ng-click="zoomIn(true)">
+                      <span class="glyphicon glyphicon-plus"></span>
+                    </button>
+                    <button class="btn btn-link btn-sm" ng-click="zoomOut(false)">
+                      <span class="glyphicon glyphicon-minus"></span>
+                    </button>
+                    <button ng-show="!working() && (!layout || !layout.running)" class="btn btn-link btn-sm" ng-click="startLayout()">
+                      <span class="glyphicon glyphicon-play"></span>
+                    </button>
+                    <button ng-show="!working() && layout && layout.running" class="btn btn-link btn-sm" ng-click="stopLayout()">
+                      <span class="glyphicon glyphicon-pause"></span>
+                    </button>
+                  </div>
+                </div>
+            </div>
+        </div>
+
+        <div ng-show="started" class="row report">
+
+            <div class="col-md-8 box">
+                <label>Results preview</label>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Source</th>
+                            <th>Target</th>
+                            <th>Level</th>
+                        </tr>
+                    </thead>
+                    <tbody id="edges"></tbody>
+                </table>
+            </div>
+
+            <div class="col-md-4 box">
+                <div class="notFound">
+                    <div ng-show="!!notFound.length" class="lbl"><b>Not found (See also section missing, or bad page name)</b></div>
+                    <ul></ul>
+                </div>
+                <br/>
+                <div ng-show="!!stoppedPages.length" class="stopped">
+                    <div class="lbl"><b>Filtered from stopWord list</b></div>
+                    <ul></ul>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</section>
